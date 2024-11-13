@@ -1,0 +1,192 @@
+<template>
+
+  <tr>
+
+    <td v-if="detail.ordId == -1">Все</td>
+    <td v-else>{{ getKeyFromDetail(detail) }}</td>
+    <td>{{ detail.name }}</td>
+    <td>{{ detail.unitPrice }}</td>
+    <td>{{ detail.quantity }}</td>
+    <td>{{ detail.unitPrice * detail.quantity }}</td>
+    <BButtonGroup class="mx-1">
+      <BButton @click="plusQuantity()">+</BButton>
+      <BButton @click="minusQuantity()">-</BButton>
+      <BButton variant="primary" @click="onAddDetailClick">Добавить деталь</BButton>
+    </BButtonGroup>
+
+
+    <BModal v-model="showModal" title="Добавить деталь">
+      <div>
+        <label>Название детали:</label>
+        <BFormInput v-model="newDetailName" type="text" class="form-control" placeholder="Введите название" />
+        <BAlert :model-value="newDetailNameAlert" variant="danger">Поле пустое</BAlert>
+
+        <label>Стоимость:</label>
+        <BFormInput v-model.number="newDetailUnitPrice" type="number" :min="0" class="form-control"
+          placeholder="Введите cтоимость" />
+        <BAlert :model-value="newDetailUnitPriceAlert" variant="danger">Поле Стоимость не может быть отрицательным
+        </BAlert>
+
+        <label>Количество:</label>
+        <BFormInput v-model.number="newDetailQuantity" type="number" :min="1" class="form-control"
+          placeholder="Введите количество" />
+        <BAlert :model-value="newDetailQuantityAlert" variant="danger">Количество минимум 1</BAlert>
+      </div>
+      <template #footer>
+        <BButton variant="primary" @click="handleOk">OK</BButton>
+      </template>
+    </BModal>
+
+
+  </tr>
+  <VehicleTableItem v-for="child in detail.childs" :detail="child"></VehicleTableItem>
+
+
+
+</template>
+
+<script lang="ts">
+import { defineComponent, PropType, ref } from 'vue';
+import { VehicleDetail } from '@/models/VehicleDetail';
+
+
+export default defineComponent({
+  name: 'VehicleTableItem',
+  props: {
+    detail: {
+      type: Object as PropType<VehicleDetail>,
+      required: true
+    }
+  },
+  setup() {
+    const showModal = ref(false)
+    const newDetailName = ref('')
+    const newDetailUnitPrice = ref(0)
+    const newDetailQuantity = ref(1)
+    const newDetailNameAlert = ref(false)
+    const newDetailUnitPriceAlert = ref(false)
+    const newDetailQuantityAlert = ref(false)
+    return {
+      showModal,
+      newDetailName,
+      newDetailUnitPrice,
+      newDetailQuantity,
+      newDetailNameAlert,
+      newDetailUnitPriceAlert,
+      newDetailQuantityAlert
+    };
+  },
+  methods: {
+    getKeyFromDetail(detail: VehicleDetail): string {
+      if (detail.parent == null || detail.parent.parent == null) {
+        return detail.ordId.toString()
+      }
+      return `${this.getKeyFromDetail(detail.parent)}.${detail.ordId}`
+    },
+    calculateUnitPrice(detail: VehicleDetail): number {
+      if (detail.childs == null) {
+        return detail.unitPrice
+      }
+      let price = 0
+      detail.childs.forEach(element => {
+        price += this.calculateUnitPrice(element) * element.quantity
+      });
+      detail.unitPrice = price
+      return price
+    },
+    plusQuantity() {
+      console.log(typeof (this.detail.quantity))
+      this.detail.quantity += 1
+      this.handlePriceChange(this.detail)
+    },
+    minusQuantity() {
+      if (this.detail.quantity !== 0) {
+        this.detail.quantity -= 1
+        this.handlePriceChange(this.detail)
+        return
+      }
+      if (this.detail.parent === null) {
+        this.handlePriceChange(this.detail)
+        return
+      }
+      this.detail.parent.childs?.splice(this.detail.parent.childs.indexOf(this.detail), 1)
+      if (this.detail.parent.childs != null) {
+        for (let i = 0; i < this.detail.parent.childs.length; i++) {
+          this.detail.parent.childs[i].ordId = i + 1
+        }
+      }
+      this.handlePriceChange(this.detail)
+    },
+
+    handlePriceChange(detail: VehicleDetail): number {
+      if (detail.parent == null) {
+        detail.unitPrice = this.calculateUnitPrice(detail)
+        return detail.unitPrice
+      }
+      return this.handlePriceChange(detail.parent)
+    },
+    handleOk() {
+      if (this.newDetailName == '') {
+        this.newDetailNameAlert = true
+      } else {
+        this.newDetailNameAlert = false
+      }
+      if (this.newDetailUnitPrice < 0) {
+        this.newDetailUnitPriceAlert = true
+      } else {
+        this.newDetailUnitPriceAlert = false
+      }
+      if (this.newDetailQuantity < 1) {
+        this.newDetailQuantityAlert = true
+      } else {
+        this.newDetailQuantityAlert = false
+      }
+      if (!this.newDetailNameAlert && !this.newDetailUnitPriceAlert && !this.newDetailQuantityAlert) {
+
+        if (this.detail.childs == null) {
+          const newDetail: VehicleDetail = {
+            ordId: 1,
+            name: this.newDetailName,
+            unitPrice: this.newDetailUnitPrice,
+            quantity: this.newDetailQuantity,
+            parent: this.detail,
+            childs: null
+          }
+          this.detail.childs = [newDetail]
+        } else {
+          const newDetail: VehicleDetail = {
+            ordId: this.detail.childs.length + 1,
+            name: this.newDetailName,
+            unitPrice: this.newDetailUnitPrice,
+            quantity: this.newDetailQuantity,
+            parent: this.detail,
+            childs: null
+          }
+          this.detail.childs.push(newDetail)
+        }
+        console.log(this.detail)
+
+        this.showModal = false
+        this.newDetailName = ''
+        this.handlePriceChange(this.detail)
+      }
+    },
+    onAddDetailClick() {
+      this.showModal = true
+      this.newDetailName = ''
+      this.newDetailUnitPrice = 0
+      this.newDetailQuantity = 1
+      this.newDetailNameAlert = false
+      this.newDetailUnitPriceAlert = false
+      this.newDetailQuantityAlert = false
+    }
+  },
+
+  mounted() {
+    this.calculateUnitPrice(this.detail)
+  }
+})
+
+</script>
+
+<style scoped></style>
