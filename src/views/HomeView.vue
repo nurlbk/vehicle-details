@@ -2,7 +2,7 @@
   <div class="home">
 
     <h1>Калькулятор деталей машины</h1>
-    <VehicleTable :vehicle="vehicle"/>
+    <VehicleTable :vehicle="vehicle" />
 
 
   </div>
@@ -23,57 +23,103 @@ export default class HomeView extends Vue {
   vehicle: VehicleDetail = {
     ordId: -1,
     name: "Машина",
-    unitPrice: 5000,
-    quantity: 10,
+    unitPrice: 0,
+    quantity: 1,
     parent: null,
+    level: 0,
     childs: [
       {
         ordId: 1,
         name: "Кузов",
-        unitPrice: 5000,
-        quantity: 10,
+        unitPrice: 0,
+        quantity: 1,
         parent: null,
+        level: 1,
+
         childs: [
           {
             ordId: 1,
             name: "Двери",
-            unitPrice: 5000,
-            quantity: 10,
+            unitPrice: 90000,
+            quantity: 4,
             parent: null,
-            childs: null
+            level: 2,
+            childs: null,
           },
           {
             ordId: 2,
             name: "Капот",
-            unitPrice: 5000,
-            quantity: 10,
+            unitPrice: 200000,
+            quantity: 1,
             parent: null,
+            level: 2,
             childs: null
           },
           {
             ordId: 3,
             name: "Багажник",
-            unitPrice: 5000,
-            quantity: 10,
+            unitPrice: 150000,
+            quantity: 1,
             parent: null,
+            level: 2,
             childs: null
           }
         ]
       },
       {
         ordId: 2,
-        name: "Двигатель",
-        unitPrice: 5000,
-        quantity: 10,
+        name: "Трансмиссия",
+        unitPrice: 0,
+        quantity: 1,
         parent: null,
-        childs: null
+        level: 1,
+        childs: [
+          {
+            ordId: 1,
+            name: "Сцепление",
+            unitPrice: 150000,
+            quantity: 1,
+            parent: null,
+            level: 2,
+            childs: null
+          },
+          {
+            ordId: 2,
+            name: "Коробка передач",
+            unitPrice: 0,
+            quantity: 1,
+            parent: null,
+            level: 2,
+            childs: [
+              {
+                ordId: 1,
+                name: "Шестерни",
+                unitPrice: 20000,
+                quantity: 12,
+                parent: null,
+                level: 3,
+                childs: null
+              },
+              {
+                ordId: 2,
+                name: "Механизм переключения",
+                unitPrice: 360000,
+                quantity: 1,
+                parent: null,
+                level: 3,
+                childs: null
+              }
+            ]
+          }
+        ]
       },
       {
         ordId: 3,
-        name: "Трансмиссия",
-        unitPrice: 5000,
-        quantity: 10,
+        name: "Двигатель",
+        unitPrice: 800000,
+        quantity: 1,
         parent: null,
+        level: 1,
         childs: null
       }
     ]

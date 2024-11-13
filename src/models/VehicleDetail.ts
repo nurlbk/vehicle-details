@@ -5,4 +5,5 @@ export type VehicleDetail = {
     quantity: number
     parent: VehicleDetail | null;
     childs: VehicleDetail[] | null;
+    level: number;
 }

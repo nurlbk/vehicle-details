@@ -95,7 +95,6 @@ export default defineComponent({
       return price
     },
     plusQuantity() {
-      console.log(typeof (this.detail.quantity))
       this.detail.quantity += 1
       this.handlePriceChange(this.detail)
     },
@@ -150,7 +149,8 @@ export default defineComponent({
             unitPrice: this.newDetailUnitPrice,
             quantity: this.newDetailQuantity,
             parent: this.detail,
-            childs: null
+            childs: null,
+            level: this.detail.level += 1
           }
           this.detail.childs = [newDetail]
         } else {
@@ -160,11 +160,13 @@ export default defineComponent({
             unitPrice: this.newDetailUnitPrice,
             quantity: this.newDetailQuantity,
             parent: this.detail,
-            childs: null
+            childs: null,
+            level: this.detail.level + 1
           }
           this.detail.childs.push(newDetail)
         }
         console.log(this.detail)
+        console.log(this.detail.level + 1)
 
         this.showModal = false
         this.newDetailName = ''
