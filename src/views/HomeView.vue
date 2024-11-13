@@ -1,7 +1,7 @@
 <template>
   <div class="home">
 
-    <h1>Welcome to Home View</h1>
+    <h1>Калькулятор деталей машины</h1>
     <VehicleTable :vehicle="vehicle"/>
 
 

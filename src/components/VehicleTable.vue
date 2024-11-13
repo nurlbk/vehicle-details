@@ -1,6 +1,12 @@
 <template>
   <div class="container">
-    <BTableSimple >
+    <div class="export">
+      <BButton variant="success" class="export-button">
+        Выгрузить в Excel
+      </BButton>
+    </div>
+
+    <BTableSimple>
       <thead>
         <tr>
           <th>ID</th>
@@ -9,13 +15,16 @@
           <th>Количество</th>
           <th>Стоимость</th>
           <th>Действия (кнопки)</th>
-          
+
         </tr>
       </thead>
       <tbody>
-        <VehicleTableItem :detail="vehicle" ></VehicleTableItem>
+        <VehicleTableItem :detail="vehicle"></VehicleTableItem>
       </tbody>
-    </BTableSimple >
+    </BTableSimple>
+
+
+
 
   </div>
 </template>
@@ -27,7 +36,7 @@ import VehicleTableItem from './VehicleTableItem.vue';
 
 export default defineComponent({
   name: 'VehicleTable',
-  components : {
+  components: {
     VehicleTableItem
   },
   props: {
@@ -43,5 +52,19 @@ export default defineComponent({
 })
 </script>
 
+
+
+
 <style scoped>
+.container{
+  width: 75%;
+}
+
+
+.export {
+  display: flex;
+  width: 100%;
+  justify-content: flex-end;
+}
+
 </style>

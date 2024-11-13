@@ -9,9 +9,9 @@
     <td>{{ detail.quantity }}</td>
     <td>{{ detail.unitPrice * detail.quantity }}</td>
     <BButtonGroup class="mx-1">
-      <BButton @click="plusQuantity()">+</BButton>
-      <BButton @click="minusQuantity()">-</BButton>
-      <BButton variant="primary" @click="onAddDetailClick">Добавить деталь</BButton>
+      <BButton variant="primary" @click="plusQuantity()" class="quantity-changer"><b>+</b></BButton>
+      <BButton variant="danger" @click="minusQuantity()" class="quantity-changer"><b>-</b></BButton>
+      <BButton variant="secondary" @click="onAddDetailClick">Добавить деталь</BButton>
     </BButtonGroup>
 
 
@@ -189,4 +189,14 @@ export default defineComponent({
 
 </script>
 
-<style scoped></style>
+
+
+<style scoped>
+
+.quantity-changer{
+  width: 36px;
+
+
+}
+
+</style>
