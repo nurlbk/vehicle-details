@@ -7,24 +7,20 @@
     </div>
 
     <BTableSimple ref="exportTable">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Деталь</th>
-          <th>Цена</th>
-          <th>Количество</th>
-          <th>Стоимость</th>
-          <th>Действия (кнопки)</th>
-        </tr>
-      </thead>
-      <tbody>
+      <BThead>
+        <BTr>
+          <BTh :style="{ width: '15%', minWidth: '120px' }">ID</BTh>
+          <BTh :style="{ minWidth: '150px' }">Деталь</BTh>
+          <BTh>Цена</BTh>
+          <BTh>Количество</BTh>
+          <BTh>Стоимость</BTh>
+          <BTh>Действия (кнопки)</BTh>
+        </BTr>
+      </BThead>
+      <BTbody>
         <VehicleTableItem :detail="vehicle"></VehicleTableItem>
-      </tbody>
+      </BTbody>
     </BTableSimple>
-
-
-
-
   </div>
 </template>
 
@@ -110,7 +106,7 @@ export default defineComponent({
 
 <style scoped>
 .container {
-  width: 75%;
+  width: 85%;
 }
 
 

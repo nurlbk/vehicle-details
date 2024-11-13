@@ -6,4 +6,4 @@ export type VehicleDetail = {
     parent: VehicleDetail | null;
     childs: VehicleDetail[] | null;
     level: number;
-}
+}   

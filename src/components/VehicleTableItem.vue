@@ -1,52 +1,52 @@
 <template>
-
-  <tr>
-
-    <td v-if="detail.ordId == -1">Все</td>
-    <td v-else>{{ getKeyFromDetail(detail) }}</td>
-    <td>{{ detail.name }}</td>
-    <td>{{ detail.unitPrice }}</td>
-    <td>{{ detail.quantity }}</td>
-    <td>{{ detail.unitPrice * detail.quantity }}</td>
+  <BTr>
+    <BTd v-if="detail.ordId == -1" class="id-row">Все</BTd>
+    <BTd v-else class="id-row" :style="offsetStyle">
+      <button v-if="detail.childs && detail.childs.length" @click="toggleChildren" class="toggle-button">
+        <span v-if="isExpanded" class="toggle-logo fa fa-chevron-down"></span>
+        <span v-else class="toggle-logo fa fa-chevron-right"></span>
+      </button>
+      {{ getKeyFromDetail(detail) }}
+    </BTd>
+    <BTd>{{ detail.name }}</BTd>
+    <BTd>{{ detail.unitPrice }}</BTd>
+    <BTd>{{ detail.quantity }}</BTd>
+    <BTd>{{ detail.unitPrice * detail.quantity }}</BTd>
     <BButtonGroup class="mx-1">
       <BButton variant="primary" @click="plusQuantity()" class="quantity-changer"><b>+</b></BButton>
       <BButton variant="danger" @click="minusQuantity()" class="quantity-changer"><b>-</b></BButton>
-      <BButton variant="secondary" @click="onAddDetailClick">Добавить деталь</BButton>
+      <BButton variant="secondary" @click="onAddDetailClick">Добавить</BButton>
     </BButtonGroup>
+  </BTr>
+  <VehicleTableItem v-if="isExpanded" v-for="child in detail.childs" :key="child.ordId" :detail="child" />
+  
+  
+  <BModal v-model="showModal" title="Добавить деталь">
+    <div>
+      <label>Название детали:</label>
+      <BFormInput v-model="newDetailName" type="text" class="form-control" placeholder="Введите название" />
+      <BAlert :model-value="newDetailNameAlert" variant="danger">Поле пустое</BAlert>
 
+      <label>Стоимость:</label>
+      <BFormInput v-model.number="newDetailUnitPrice" type="number" :min="0" class="form-control"
+        placeholder="Введите cтоимость" />
+      <BAlert :model-value="newDetailUnitPriceAlert" variant="danger">Поле Стоимость не может быть отрицательным
+      </BAlert>
 
-    <BModal v-model="showModal" title="Добавить деталь">
-      <div>
-        <label>Название детали:</label>
-        <BFormInput v-model="newDetailName" type="text" class="form-control" placeholder="Введите название" />
-        <BAlert :model-value="newDetailNameAlert" variant="danger">Поле пустое</BAlert>
-
-        <label>Стоимость:</label>
-        <BFormInput v-model.number="newDetailUnitPrice" type="number" :min="0" class="form-control"
-          placeholder="Введите cтоимость" />
-        <BAlert :model-value="newDetailUnitPriceAlert" variant="danger">Поле Стоимость не может быть отрицательным
-        </BAlert>
-
-        <label>Количество:</label>
-        <BFormInput v-model.number="newDetailQuantity" type="number" :min="1" class="form-control"
-          placeholder="Введите количество" />
-        <BAlert :model-value="newDetailQuantityAlert" variant="danger">Количество минимум 1</BAlert>
-      </div>
-      <template #footer>
-        <BButton variant="primary" @click="handleOk">OK</BButton>
-      </template>
-    </BModal>
-
-
-  </tr>
-  <VehicleTableItem v-for="child in detail.childs" :detail="child"></VehicleTableItem>
-
-
+      <label>Количество:</label>
+      <BFormInput v-model.number="newDetailQuantity" type="number" :min="1" class="form-control"
+        placeholder="Введите количество" />
+      <BAlert :model-value="newDetailQuantityAlert" variant="danger">Количество минимум 1</BAlert>
+    </div>
+    <template #footer>
+      <BButton variant="primary" @click="handleOk">OK</BButton>
+    </template>
+  </BModal>
 
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, ref } from 'vue';
+import { computed, defineComponent, PropType, ref } from 'vue';
 import { VehicleDetail } from '@/models/VehicleDetail';
 
 
@@ -56,9 +56,22 @@ export default defineComponent({
     detail: {
       type: Object as PropType<VehicleDetail>,
       required: true
-    }
+    },
   },
-  setup() {
+  setup(props) {
+    let paddingLeft = 0
+    paddingLeft = (props.detail.level - 1) * 15
+    if (props.detail.childs == null) {
+      paddingLeft += 30
+    }
+    const offsetStyle = computed(() => ({
+      paddingLeft: `${paddingLeft}px`,
+    }));
+
+    function toggleChildren() {
+      isExpanded.value = !isExpanded.value;
+    }
+
     const showModal = ref(false)
     const newDetailName = ref('')
     const newDetailUnitPrice = ref(0)
@@ -66,6 +79,7 @@ export default defineComponent({
     const newDetailNameAlert = ref(false)
     const newDetailUnitPriceAlert = ref(false)
     const newDetailQuantityAlert = ref(false)
+    const isExpanded = ref(true);
     return {
       showModal,
       newDetailName,
@@ -73,7 +87,10 @@ export default defineComponent({
       newDetailQuantity,
       newDetailNameAlert,
       newDetailUnitPriceAlert,
-      newDetailQuantityAlert
+      newDetailQuantityAlert,
+      offsetStyle,
+      isExpanded,
+      toggleChildren
     };
   },
   methods: {
@@ -150,7 +167,7 @@ export default defineComponent({
             quantity: this.newDetailQuantity,
             parent: this.detail,
             childs: null,
-            level: this.detail.level += 1
+            level: this.detail.level + 1
           }
           this.detail.childs = [newDetail]
         } else {
@@ -165,8 +182,6 @@ export default defineComponent({
           }
           this.detail.childs.push(newDetail)
         }
-        console.log(this.detail)
-        console.log(this.detail.level + 1)
 
         this.showModal = false
         this.newDetailName = ''
@@ -194,11 +209,22 @@ export default defineComponent({
 
 
 <style scoped>
-
-.quantity-changer{
+.quantity-changer {
   width: 36px;
-
-
 }
 
+.id-row {
+  text-align: left;
+}
+
+.toggle-button {
+    background: none;
+    border: none;
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+.toggle-logo {
+  width: 26px;
+}
 </style>

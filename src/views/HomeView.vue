@@ -102,7 +102,7 @@ export default class HomeView extends Vue {
               },
               {
                 ordId: 2,
-                name: "Механизм переключения",
+                name: "Механизм",
                 unitPrice: 360000,
                 quantity: 1,
                 parent: null,
