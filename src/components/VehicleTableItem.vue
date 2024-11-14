@@ -1,12 +1,15 @@
 <template>
   <BTr>
-    <BTd v-if="detail.ordId == -1" class="id-row">Все</BTd>
-    <BTd v-else class="id-row" :style="offsetStyle">
-      <button v-if="detail.childs && detail.childs.length" @click="toggleChildren" class="toggle-button">
+    <BTd v-if="detail.ordId == -1" class="id-row" :style="{ paddingLeft: 30 + 'px' }">Все</BTd>
+    <BTd v-else class="id-row">
+      <button v-if="detail.childs && detail.childs.length" @click="toggleChildren" class="toggle-button"
+        :style="{ paddingLeft: (detail.level - 1) * 15 + 'px' }">
         <span v-if="isExpanded" class="toggle-logo fa fa-chevron-down"></span>
         <span v-else class="toggle-logo fa fa-chevron-right"></span>
       </button>
-      {{ getKeyFromDetail(detail) }}
+      <div :style="{ paddingLeft: (detail.level - 1) * 15 + 30 + 'px' }">
+        {{ getKeyFromDetail(detail) }}
+      </div>
     </BTd>
     <BTd>{{ detail.name }}</BTd>
     <BTd>{{ detail.unitPrice }}</BTd>
@@ -19,8 +22,8 @@
     </BButtonGroup>
   </BTr>
   <VehicleTableItem v-if="isExpanded" v-for="child in detail.childs" :key="child.ordId" :detail="child" />
-  
-  
+
+
   <BModal v-model="showModal" title="Добавить деталь">
     <div>
       <label>Название детали:</label>
@@ -46,7 +49,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, PropType, ref } from 'vue';
+import { defineComponent, PropType, ref } from 'vue';
 import { VehicleDetail } from '@/models/VehicleDetail';
 
 
@@ -58,16 +61,7 @@ export default defineComponent({
       required: true
     },
   },
-  setup(props) {
-    let paddingLeft = 0
-    paddingLeft = (props.detail.level - 1) * 15
-    if (props.detail.childs == null) {
-      paddingLeft += 30
-    }
-    const offsetStyle = computed(() => ({
-      paddingLeft: `${paddingLeft}px`,
-    }));
-
+  setup() {
     function toggleChildren() {
       isExpanded.value = !isExpanded.value;
     }
@@ -88,7 +82,6 @@ export default defineComponent({
       newDetailNameAlert,
       newDetailUnitPriceAlert,
       newDetailQuantityAlert,
-      offsetStyle,
       isExpanded,
       toggleChildren
     };
@@ -215,13 +208,14 @@ export default defineComponent({
 
 .id-row {
   text-align: left;
+  position: relative;
 }
 
 .toggle-button {
-    background: none;
-    border: none;
-    padding-left: 0px;
-    padding-right: 0px;
+  position: absolute;
+  background: none;
+  border: none;
+  padding-right: 0px;
 }
 
 .toggle-logo {
